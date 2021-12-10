@@ -1,0 +1,50 @@
+---
+#
+# Create ISE Internal User(s)
+#
+- name: Create Internal User(s) Play
+  hosts: ise_deployment
+  vars:
+    ise_username: admin
+    ise_password: ISEisC00L
+    ise_verify:   false
+  gather_facts: no
+  tasks:
+
+  - name: Create user test1
+    cisco.ise.internal_user:
+      ise_hostname: "{{ inventory_hostname }}"
+      ise_username: "{{ ise_username }}"
+      ise_password: "{{ ise_password }}"
+      ise_verify: "{{ ise_verify }}"
+      state: present
+      name: test1
+      password: ISEisC00L
+      enabled: true
+      changePassword: false
+    register: results
+
+  # - name: Show results
+  #   ansible.builtin.debug:
+  #     var: results
+
+
+  - name: Create user test2
+    cisco.ise.internal_user:
+      ise_hostname: "{{ inventory_hostname }}"
+      ise_username: "{{ ise_username }}"
+      ise_password: "{{ ise_password }}"
+      ise_verify: "{{ ise_verify }}"
+      state: present
+      name: test2
+      password: ISEisC00L
+      enabled: true
+      changePassword: false
+    register: results
+
+  # - name: Show results
+  #   ansible.builtin.debug:
+  #     var: results
+
+
+...

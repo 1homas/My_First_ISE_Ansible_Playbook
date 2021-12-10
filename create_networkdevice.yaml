@@ -1,0 +1,60 @@
+---
+
+- name: Create Network Device(s) Play
+  hosts: ise_deployment
+  vars:
+    ise_username: "{{ lookup('env','ise_username') }}"
+    ise_password: "{{ lookup('env','ise_password') }}"
+    ise_verify:   "{{ lookup('env','ise_verify') }}"
+    ise_login: &ise_login
+      ise_hostname: "{{ inventory_hostname }}"
+      ise_username: "{{ ise_username }}"
+      ise_password: "{{ ise_password }}"
+      ise_verify:   "{{ ise_verify }}"
+  gather_facts: no
+  tasks:
+
+  - name: Create my_network_device
+    cisco.ise.network_device:
+      <<: *ise_login
+      state: present
+      name: my_network_device
+      description: 
+      profileName: Cisco
+      NetworkDeviceIPList:
+      - ipaddress: 1.2.3.4
+        mask: 32
+      NetworkDeviceGroupList: 
+      - Location#All Locations
+      - IPSEC#Is IPSEC Device#No
+      - Device Type#All Device Types
+      authenticationSettings:
+        networkProtocol: RADIUS
+        radiusSharedSecret: my_radius_secret
+        enableKeyWrap: False
+        dtlsRequired: False
+        enableMultiSecret: string
+      # tacacsSettings:
+      #   sharedSecret: my_tacacs_secret
+      #   connectModeOptions: "OFF"
+      #   previousSharedSecret:
+      #   previousSharedSecretExpiry: 0
+      # snmpsettings:
+      #   version: TWO_C
+      #   roCommunity: my_snmp_secret
+      #   authPassowrd: my_snmp_password
+      #   privacyPassowrd: string
+      #   pollingInterval: 28800
+      #   linkTrapQuery: true
+      #   macTrapQuery: true
+      #   originatingPolicyServicesNode: Auto
+      # dtlsDnsName: my_network_device
+      # coaPort: 0
+    register: results
+
+
+  # - name: Debug results
+  #   ansible.builtin.debug:
+  #     var: resultss
+
+...
