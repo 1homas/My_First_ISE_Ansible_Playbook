@@ -1,0 +1,33 @@
+# users.yaml
+#
+# This file contains list of users
+# From examples in https://github.com/eiddor/ise-automation-ansible 
+#
+# Default password for users
+
+default_password: "ISEisC00L"
+
+# List your usernames here
+# These will be read by create_internalusers-bulk.yaml
+
+userlist:
+  - name: employee1  # the actual username to be used for authentication
+    firstname: One  # first name for identification purposes
+    lastname: Alpha  # last name for identification purposes
+    description: User added with automation  # description for the user (makes filtering easier)
+  - name: employee2
+    firstname: Two
+    lastname: Beta
+    description: User added with automation
+  - name: employee3
+    firstname: Three
+    lastname: Gamma
+    description: User added with automation
+  - name: employee4
+    firstname: Four
+    lastname: Delta
+    description: User added with automation
+  - name: employee5
+    firstname: Five
+    lastname: Epsilon
+    description: User added with automation

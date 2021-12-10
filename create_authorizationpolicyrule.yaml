@@ -1,0 +1,54 @@
+---
+#
+# Create Authorization Policy Rule
+# From examples in https://github.com/eiddor/ise-automation-ansible 
+#
+- name: Create Authorization Policy Rule Play
+  hosts: ise_deployment
+  vars:
+    ise_username: "{{ lookup('env','ise_username') }}"
+    ise_password: "{{ lookup('env','ise_password') }}"
+    ise_verify:   "{{ lookup('env','ise_verify') }}"
+    ise_login: &ise_login
+      ise_hostname: "{{ inventory_hostname }}"
+      ise_username: "{{ ise_username }}"
+      ise_password: "{{ ise_password }}"
+      ise_verify:   "{{ ise_verify }}"
+  gather_facts: no
+  tasks:
+
+# This will get us info for all of the policy sets
+    - name: Get all policy set info
+      cisco.ise.network_access_policy_set_info:
+        <<: *ise_login
+      register: allsets  # register policy set info to a variable
+
+    - name: Set policyId  # set a policyid variable with the id from the default policy set
+      set_fact:
+        policyid: "{{ allsets.ise_response.response | map(attribute='id') }}"
+
+    - name: Get all Network Access Authentication Rules
+      cisco.ise.network_access_authentication_rules_info:
+        <<: *ise_login
+        policyId: "{{ policyid[0] }}"  # Read the policyid for the default policy
+      register: policylist  # register the output to a variable
+
+    - name: Add Employee user access rules
+      cisco.ise.network_access_authorization_rules:
+        <<: *ise_login
+        state: present
+        rule:
+          default: false
+          rank: 0  # list the new rule on top
+          state: enabled
+          condition:  # match the condition to Employee group
+            conditionType: ConditionAttributes
+            isNegate: false
+            dictionaryName: IdentityGroup
+            attributeName: Name
+            operator: equals
+            attributeValue: Employees
+          name: User_VLAN_Access_Rule  # name our authz policy appropriately
+        profile:
+          - User_VLAN_Access  # assign the User_VLAN_Access authz profile
+        policyId: "{{ policyid[0] }}"  # pass the policy ID that we got earlier

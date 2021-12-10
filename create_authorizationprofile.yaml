@@ -1,0 +1,31 @@
+---
+#
+# Create Authorization Profile
+#
+
+- name: Create Authorization Profile Play
+  hosts: ise_deployment
+  vars:
+    ise_username: "{{ lookup('env','ise_username') }}"
+    ise_password: "{{ lookup('env','ise_password') }}"
+    ise_verify:   "{{ lookup('env','ise_verify') }}"
+    ise_login: &ise_login
+      ise_hostname: "{{ inventory_hostname }}"
+      ise_username: "{{ ise_username }}"
+      ise_password: "{{ ise_password }}"
+      ise_verify:   "{{ ise_verify }}"
+  gather_facts: no
+  tasks:
+
+    - name: Create authorization profile
+      cisco.ise.authorization_profile:
+        <<: *ise_login
+        state: present
+        accessType: ACCESS_ACCEPT  # allow the user onto the network
+        name: User_VLAN_Access  # give authz profile a name
+        description: Auto generated  # give authz profile a description
+        vlan:
+          nameID: User_VLAN  # VLAN ID or name to be assigned
+          tagID: 1  # This is not the VLAD ID, it's a RADIUS tunnel tag
+
+...

@@ -1,0 +1,45 @@
+---
+#
+# Create Bulk ISE Internal User(s)
+# From examples in https://github.com/eiddor/ise-automation-ansible 
+#
+- name: Create BULK Internal Users Play
+  hosts: ise_deployment
+  vars:
+    ise_username: "{{ lookup('env','ise_username') }}"
+    ise_password: "{{ lookup('env','ise_password') }}"
+    ise_verify:   "{{ lookup('env','ise_verify') }}"
+    ise_login: &ise_login
+      ise_hostname: "{{ inventory_hostname }}"
+      ise_username: "{{ ise_username }}"
+      ise_password: "{{ ise_password }}"
+      ise_verify:   "{{ ise_verify }}"
+  vars_files:
+    - users.yaml  # read in the list of users from users.yaml file
+  gather_facts: no
+
+  tasks:
+
+    - name: Read Employee group ID
+      cisco.ise.identity_group:
+        <<: *ise_login 
+        state: present
+        name: "Employee"
+      register: identity_group_employee
+
+    - name: create users and place them into Employee group
+      cisco.ise.internal_user:
+        <<: *ise_login
+        state: present
+        name: "{{ item.name }}"  # username from user list
+        description: "{{ item.description }}"  # description from user list
+        firstName: "{{ item.firstname }}"  # first name from user list
+        lastName: "{{ item.lastname }}"  # last name from user list
+        password: "{{ default_password }}"  # obtained from users.yaml
+        identityGroups: "{{ identity_group_employee.ise_response.id }}"  # group assignment
+        changePassword: false  # prompt for password change
+        enabled: true  # enable user
+      loop: "{{ userlist }}"  # the user list variable from users.yaml
+      register: identity_users  # register the output to a variable
+
+...
