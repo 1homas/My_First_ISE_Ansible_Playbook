@@ -47,7 +47,7 @@
             dictionaryName: IdentityGroup
             attributeName: Name
             operator: equals
-            attributeValue: Employee
+            attributeValue: User Identity Groups:Employee
           name: User_VLAN_Access_Rule  # name our authz policy appropriately
         profile:
           - User_VLAN_Access  # assign the User_VLAN_Access authz profile
